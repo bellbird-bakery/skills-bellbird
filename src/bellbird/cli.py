@@ -7,6 +7,40 @@ from pathlib import Path
 
 import yaml
 
+BANNER = """
+██████╗ ███████╗██╗     ██╗     ██████╗ ██╗██████╗ ██████╗
+██╔══██╗██╔════╝██║     ██║     ██╔══██╗██║██╔══██╗██╔══██╗
+██████╔╝█████╗  ██║     ██║     ██████╔╝██║██████╔╝██║  ██║
+██╔══██╗██╔══╝  ██║     ██║     ██╔══██╗██║██╔══██╗██║  ██║
+██████╔╝███████╗███████╗███████╗██████╔╝██║██║  ██║██████╔╝
+╚═════╝ ╚══════╝╚══════╝╚══════╝╚═════╝ ╚═╝╚═╝  ╚═╝╚═════╝
+"""
+
+TAGLINE = "Claude Code Skills Manager - Template Distribution Tool"
+
+
+def show_banner() -> None:
+    """Display the colored ASCII art banner."""
+    from rich.console import Console
+    from rich.text import Text
+    from rich.align import Align
+
+    console = Console()
+    banner_lines = BANNER.strip().split("\n")
+    colors = ["bright_blue", "blue", "cyan", "bright_cyan", "white", "bright_white"]
+
+    styled_banner = Text()
+    for i, line in enumerate(banner_lines):
+        color = colors[i % len(colors)]
+        styled_banner.append(line + "\n", style=color)
+
+    console.print()
+    console.print(Align.center(styled_banner))
+    console.print(Align.center(Text(TAGLINE, style="italic bright_yellow")))
+    console.print()
+    console.print(Align.center(Text("Run 'bellbird --help' for usage information", style="dim")))
+    console.print()
+
 
 def get_templates_dir() -> Path:
     """Return the path to the bundled templates directory."""
@@ -213,7 +247,7 @@ def main() -> None:
     elif args.command == "init":
         cmd_init(args)
     else:
-        parser.print_help()
+        show_banner()
 
 
 if __name__ == "__main__":
