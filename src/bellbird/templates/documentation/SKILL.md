@@ -17,41 +17,38 @@ frontmatter_schema:
 
 # Frontmatter is hidden from humans in MkDocs, visible to Claude
 
-structure:
+recommended_structure:
   docs/architecture/:
-    - overview.md        # app structure, data models, UI patterns
-    - data-models.md     # Django models by domain
-    - service-layer.md   # import rules, tier classification
-    - async-overview.md  # when to use async tasks
-    - async-implementation-guide.md  # how to implement async
+    purpose: System design and code organization
+    examples:
+      - overview.md        # app structure, patterns
+      - data-models.md     # models by domain
+      - service-layer.md   # import rules, tiers
 
   docs/features/:
-    - recalls.md         # MPI NZ compliance, mock recalls
-    - ingredient-stock.md # recipe calculation, stock tracking
-    - reporting.md       # CSV and PDF reports
-    - dashboards.md      # KPI cards, chart cards
-    - kanban-workflow.md # drag-drop pipelines
-    - automatic-follow-up-system.md  # customer check-ins
+    purpose: Feature-specific documentation
+    examples:
+      - feature-name.md    # how a feature works
 
   docs/integrations/:
-    - xero.md           # invoicing, credit notes
-    - woocommerce.md    # order imports, webhooks
+    purpose: External API and service integrations
+    examples:
+      - api-name.md        # setup, auth, gotchas
 
   docs/operations/:
-    - commands.md       # just, docker, django commands
-    - configuration.md  # env vars, settings
-    - deployment.md     # CI/CD, nginx
-    - celery.md         # scheduled tasks
-    - troubleshooting.md # common issues
-    - learnings.yaml    # cross-cutting knowledge from /reflect (YAML-only)
+    purpose: Running and maintaining the project
+    examples:
+      - commands.md        # common commands
+      - configuration.md   # env vars, settings
+      - deployment.md      # CI/CD, hosting
+      - troubleshooting.md # common issues
+      - learnings.yaml     # cross-cutting knowledge (YAML-only)
 
   docs/standards/:
-    - timezone.md       # datetime handling rules
-    - templates.md      # HTML/CSS conventions
-    - nginx-websocket.md # WebSocket proxy config
-
-  docs/framework/:
-    - speckit.md        # specification commands
+    purpose: Code conventions and patterns
+    examples:
+      - coding-style.md    # formatting, naming
+      - testing.md         # test patterns
 
 navigation:
   # To find the right doc, read frontmatter from likely candidates
@@ -66,16 +63,19 @@ navigation:
     code_conventions: docs/standards/
 
 serving:
-  command: just docs
-  build: just docs-build
-  runs_on: host via uvx (not Docker)
+  mkdocs:
+    command: mkdocs serve
+    build: mkdocs build
+  justfile:
+    command: just docs
+    build: just docs-build
 
 adding_documentation:
   steps:
     1: Create docs/<category>/<name>.md
     2: Add frontmatter with all schema fields
-    3: Update mkdocs.yml nav section
-    4: Preview with just docs
+    3: Update mkdocs.yml nav section (if using MkDocs)
+    4: Preview locally
 
   naming: lowercase-with-hyphens
 
@@ -99,7 +99,7 @@ updating_documentation:
     - Read existing frontmatter first
     - Update content AND frontmatter if topics change
     - Ensure related links are bidirectional
-    - Preview with just docs
+    - Preview locally
 
 capturing_learnings:
   command: /reflect
@@ -107,9 +107,9 @@ capturing_learnings:
   workflow:
     - Reviews conversation context
     - Identifies knowledge gaps encountered
-    - Adds to relevant doc OR docs/operations/learnings.yaml
+    - Adds to relevant doc OR docs/learnings.yaml
     - Updates frontmatter if new topics added
   learnings_yaml_format:
     note: YAML-only file optimized for Claude, not human reading
-    schema: See .claude/commands/reflect.md for entry format
+    schema: See /reflect command for entry format
 ```
