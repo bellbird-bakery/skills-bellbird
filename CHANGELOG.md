@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Release-hook command template for chaining full release workflow (docs, changelog, version bump, tag, push) (#1)
+- Project-aware template tailoring — templates are rendered with context from pyproject.toml and git at install time
+
 ## [0.2.0] - 2026-03-26
 
 ### Added

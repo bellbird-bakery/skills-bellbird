@@ -50,6 +50,7 @@ Skills are copied to `.claude/skills/<name>/SKILL.md` and commands to `.claude/c
 |----------|------|-------------|
 | `commit` | Command | Create commits with conventional format |
 | `release` | Command | Bump version and update CHANGELOG.md |
+| `release-hook` | Command | Chain the full release workflow — docs, changelog, version bump, tag, and push |
 | `changelog` | Command | Add entries to the [Unreleased] section of CHANGELOG.md |
 | `documentation` | Skill | Background context for documentation standards |
 
@@ -59,13 +60,13 @@ The included commands support a chained release workflow:
 
 1. **`/changelog`** — Add entries to `[Unreleased]` as you work
 2. **`/release`** — Bump version, move unreleased entries to a version section, commit
-3. Tag and push:
-   ```bash
-   git tag vX.Y.Z
-   git push && git push --tags
-   ```
+3. **`/release-hook`** — Run the full chain: docs check → changelog review → version bump → tag → push
 
-A hook template to automate this full chain is planned — see [#1](https://github.com/bellbird-bakery/skills-bellbird/issues/1).
+`/release-hook` accepts options:
+- Bump type: `/release-hook minor`
+- `--dry-run` — preview what would happen without executing
+- `--skip-docs` — skip documentation validation
+- `--no-push` — stop after tagging
 
 ## Adding templates
 

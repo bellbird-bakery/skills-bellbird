@@ -9,7 +9,7 @@ description: Add an entry to the [Unreleased] section of CHANGELOG.md. Use this 
 $ARGUMENTS
 ```
 
-You are adding a changelog entry to the `[Unreleased]` section of `CHANGELOG.md`.
+You are adding a changelog entry to the `[Unreleased]` section of `CHANGELOG.md` for **{{project_name}}**.
 
 ## Execution Steps
 

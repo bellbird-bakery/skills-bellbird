@@ -1,8 +1,11 @@
 """Bellbird CLI - install template skills and commands into projects."""
 
 import argparse
+import re
 import shutil
+import subprocess
 import sys
+import tomllib
 from pathlib import Path
 
 import yaml
@@ -58,6 +61,60 @@ def parse_frontmatter(content: str) -> dict:
         return yaml.safe_load(content[3:end].strip()) or {}
     except yaml.YAMLError:
         return {}
+
+
+def read_project_context(project_root: Path) -> dict:
+    """Read project context from pyproject.toml and git."""
+    context = {
+        "project_name": project_root.name,
+        "main_branch": "main",
+        "python_requires": "",
+        "version_file": "",
+    }
+
+    # Read pyproject.toml
+    pyproject_path = project_root / "pyproject.toml"
+    if pyproject_path.exists():
+        try:
+            data = tomllib.loads(pyproject_path.read_text(encoding="utf-8"))
+            project = data.get("project", {})
+            context["project_name"] = project.get("name", context["project_name"])
+            context["python_requires"] = project.get("requires-python", "")
+        except (tomllib.TOMLDecodeError, OSError):
+            pass
+
+    # Detect main branch from git
+    try:
+        result = subprocess.run(
+            ["git", "rev-parse", "--abbrev-ref", "HEAD"],
+            capture_output=True,
+            text=True,
+            cwd=project_root,
+        )
+        if result.returncode == 0 and result.stdout.strip():
+            context["main_branch"] = result.stdout.strip()
+    except FileNotFoundError:
+        pass
+
+    # Find version file (__init__.py with __version__)
+    for init_file in project_root.rglob("__init__.py"):
+        try:
+            if "__version__" in init_file.read_text(encoding="utf-8"):
+                context["version_file"] = str(init_file.relative_to(project_root))
+                break
+        except OSError:
+            continue
+
+    return context
+
+
+def render_template(content: str, context: dict) -> str:
+    """Replace {{key}} placeholders with values from context."""
+    def replacer(match: re.Match) -> str:
+        key = match.group(1).strip()
+        return context.get(key, match.group(0))
+
+    return re.sub(r"\{\{(\w+)\}\}", replacer, content)
 
 
 def detect_template_type(template_dir: Path) -> str | None:
@@ -168,6 +225,7 @@ def cmd_init(args: argparse.Namespace) -> None:
         print("No templates selected.")
         return
 
+    context = read_project_context(project_root)
     installed = []
 
     for template in selected:
@@ -178,7 +236,14 @@ def cmd_init(args: argparse.Namespace) -> None:
                 continue
             if dest.exists():
                 shutil.rmtree(dest)
-            shutil.copytree(template["path"], dest)
+            dest.mkdir(parents=True, exist_ok=True)
+            for src_file in template["path"].iterdir():
+                dest_file = dest / src_file.name
+                if src_file.suffix == ".md":
+                    content = src_file.read_text(encoding="utf-8")
+                    dest_file.write_text(render_template(content, context), encoding="utf-8")
+                else:
+                    shutil.copy2(src_file, dest_file)
         else:
             commands_dir = project_root / ".claude" / "commands"
             commands_dir.mkdir(parents=True, exist_ok=True)
@@ -187,7 +252,8 @@ def cmd_init(args: argparse.Namespace) -> None:
             if dest.exists() and not args.force:
                 print(f"  Skipped {template['name']} (already exists, use --force to overwrite)")
                 continue
-            shutil.copy2(src, dest)
+            content = src.read_text(encoding="utf-8")
+            dest.write_text(render_template(content, context), encoding="utf-8")
 
         installed.append(template)
         print(f"  Installed {template['name']} ({template['type']})")

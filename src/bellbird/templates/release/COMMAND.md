@@ -1,6 +1,6 @@
 ---
 name: release
-description: Bump the project version and update CHANGELOG.md by moving [Unreleased] entries to a new version section. Only runs on the develop branch.
+description: Bump the project version and update CHANGELOG.md by moving [Unreleased] entries to a new version section.
 ---
 
 ## User Input
@@ -9,13 +9,13 @@ description: Bump the project version and update CHANGELOG.md by moving [Unrelea
 $ARGUMENTS
 ```
 
-You are performing a version bump and changelog update.
+You are performing a version bump and changelog update for **{{project_name}}**.
 
 ## Execution Steps
 
 ### Step 1: Pre-flight Checks
 
-1. Verify you're on the `develop` branch (abort if not)
+1. Verify you're on the `{{main_branch}}` branch (abort if not)
 2. Check for uncommitted changes and warn if present
 3. Read the current version from `pyproject.toml`
 4. Read the `[Unreleased]` section from `CHANGELOG.md`
@@ -34,7 +34,7 @@ Based on user input (`$ARGUMENTS`):
 
 Run `uv version --bump <type>` to update the version in `pyproject.toml`.
 
-Also update `__version__` in the package `__init__.py` if it exists.
+Also update `__version__` in `{{version_file}}` if it exists.
 
 ### Step 4: Update CHANGELOG.md
 
@@ -45,7 +45,7 @@ Also update `__version__` in the package `__init__.py` if it exists.
 
 ### Step 5: Commit
 
-Stage `pyproject.toml`, `CHANGELOG.md`, and any `__init__.py` with version changes, then commit:
+Stage `pyproject.toml`, `CHANGELOG.md`, and `{{version_file}}` (if updated), then commit:
 
 ```
 release: vX.Y.Z
@@ -61,6 +61,6 @@ Show:
 
 ## Edge Cases
 
-- **Not on develop**: Tell the user to switch branches first
+- **Not on {{main_branch}}**: Tell the user to switch branches first
 - **Empty [Unreleased]**: Warn the user; ask if they want to proceed with an empty release or add changes first
 - **No CHANGELOG.md**: Create one with the standard format
