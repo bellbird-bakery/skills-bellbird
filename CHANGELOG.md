@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Spec skill template — researches the codebase and drafts a complete feature spec for the user to refine
+- Spec-review skill template — pre-plan gate that reviews specs for gaps, ambiguities, and unresolved decisions
+
 ## [0.3.0] - 2026-03-26
 
 ### Added
